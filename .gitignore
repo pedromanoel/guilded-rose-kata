@@ -1,6 +1,7 @@
 /.idea
 /build
 /.gradle
-guilded-rose-kata.iml
-guilded-rose-kata.ipr
-guilded-rose-kata.iws
+/guilded-rose-kata.iml
+/guilded-rose-kata.ipr
+/guilded-rose-kata.iws
+/.gradletasknamecache
