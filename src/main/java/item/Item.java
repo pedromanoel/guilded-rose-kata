@@ -34,4 +34,16 @@ public class Item {
     public String name() {
         return this.name;
     }
+
+    public void name(String name) {
+        this.name = name;
+    }
+
+    public void sellIn(int sellIn) {
+        this.sellIn = sellIn;
+    }
+
+    public void quality(int quality) {
+        this.quality = quality;
+    }
 }
