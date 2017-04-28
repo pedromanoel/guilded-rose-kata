@@ -19,6 +19,14 @@ repositories {
     jcenter()
 }
 
+test {
+    reports.html.enabled = false
+
+    testLogging {
+        exceptionFormat "full"
+    }
+}
+
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:21.0'

@@ -1,18 +1,18 @@
 import item.Item;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class App {
-    
-    private List<Item> items;
 
     public static void main(String[] args) {
         System.out.println("OMGHAI!");
 
         App app = new App();
-        app.items = Arrays.asList(
+        List<Item> items = Arrays.asList(
                 new Item("+5 Dexterity Vest", 10, 20),
                 new Item("Aged Brie", 2, 0),
                 new Item("Elixir of the Mongoose", 5, 7),
@@ -21,58 +21,87 @@ public class App {
                 new Item("Conjured Mana Cake", 3, 6)
         );
 
-        app.UpdateQuality();
+        app.updateQuality(items);
     }
 
-    private void UpdateQuality() {
-        for (int i = 0; i < items.size(); i++) {
-            if (!Objects.equals(items.get(i).name(), "Aged Brie") && !Objects.equals(items.get(i).name(), "Backstage passes to a TAFKAL80ETC concert")) {
-                if (items.get(i).quality() > 0) {
-                    if (!Objects.equals(items.get(i).name(), "Sulfuras, Hand of Ragnaros")) {
-                        items.get(i).quality(items.get(i).quality() - 1);
-                    }
-                }
+    List<Item> updateQuality(List<Item> items) {
+        ArrayList<Item> returnItems = new ArrayList<>(items);
+
+        for (Item item : returnItems) {
+            if (item.name().equals("Sulfuras, Hand of Ragnaros")) {
+                continue;
+            }
+
+            if (decreasesQualityWithTime(item)) {
+                decreaseQuality(item);
             } else {
-                if (items.get(i).quality() < 50) {
-                    items.get(i).quality(items.get(i).quality() + 1);
-
-                    if (Objects.equals(items.get(i).name(), "Backstage passes to a TAFKAL80ETC concert")) {
-                        if (items.get(i).sellIn() < 11) {
-                            if (items.get(i).quality() < 50) {
-                                items.get(i).quality(items.get(i).quality() + 1);
-                            }
-                        }
-
-                        if (items.get(i).sellIn() < 6) {
-                            if (items.get(i).quality() < 50) {
-                                items.get(i).quality(items.get(i).quality() + 1);
-                            }
-                        }
-                    }
-                }
+                increaseQuality(item);
             }
 
-            if (!Objects.equals(items.get(i).name(), "Sulfuras, Hand of Ragnaros")) {
-                items.get(i).sellIn(items.get(i).sellIn() - 1);
+            item.sellIn(item.sellIn() - 1);
+
+            if (item.sellIn() >= 0) {
+                continue;
             }
 
-            if (items.get(i).sellIn() < 0) {
-                if (!Objects.equals(items.get(i).name(), "Aged Brie")) {
-                    if (!Objects.equals(items.get(i).name(), "Backstage passes to a TAFKAL80ETC concert")) {
-                        if (items.get(i).quality() > 0) {
-                            if (!Objects.equals(items.get(i).name(), "Sulfuras, Hand of Ragnaros")) {
-                                items.get(i).quality(items.get(i).quality() - 1);
-                            }
-                        }
-                    } else {
-                        items.get(i).quality(items.get(i).quality() - items.get(i).quality());
-                    }
-                } else {
-                    if (items.get(i).quality() < 50) {
-                        items.get(i).quality(items.get(i).quality() + 1);
-                    }
-                }
+            if (item.name().equals("Aged Brie")) {
+                continue;
+            }
+
+            if (Objects.equals(item.name(), "Backstage passes to a TAFKAL80ETC concert")) {
+                item.quality(item.quality() - item.quality());
+
+                continue;
+            }
+
+            decreaseQuality(item);
+        }
+
+        return returnItems;
+    }
+
+    private void increaseQuality(Item item) {
+        if (item.quality() >= 50) {
+            return;
+        }
+
+        item.quality(item.quality() + getIncrease(item));
+    }
+
+    private void decreaseQuality(Item item) {
+        if (item.quality() <= 0) {
+            return;
+        }
+
+        item.quality(item.quality() - getDecrease());
+    }
+
+    private int getIncrease(Item item) {
+        int increase = 1;
+
+        if (item.name().equals("Backstage passes to a TAFKAL80ETC concert")) {
+            if (item.sellIn() < 11) {
+                increase = 2;
+            }
+
+            if (item.sellIn() < 6) {
+                increase = 3;
             }
         }
+
+        return increase;
+    }
+
+    private int getDecrease() {
+        return 1;
+    }
+
+    private boolean decreasesQualityWithTime(Item item) {
+        boolean decreases;
+
+        decreases = Stream.of("Aged Brie", "Backstage passes to a TAFKAL80ETC concert")
+                .noneMatch(i -> item.name().equals(i));
+
+        return decreases;
     }
 }
