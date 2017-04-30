@@ -114,6 +114,20 @@ public class AppTest {
         assertThat(items.get(0).quality(), equalTo(0));
     }
 
+    @Test
+    public void conjuredDecreasesByTwoWhenSellInGreaterThanZero() throws Exception {
+        addAnItem("Conjured", 1, 10);
+
+        assertThat(app.updateQuality(this.items).get(0).quality(), equalTo(8));
+    }
+
+    @Test
+    public void conjuredDecreasesByFourWhenSellInLessThanZero() throws Exception {
+        addAnItem("Conjured", 0, 10);
+
+        assertThat(app.updateQuality(this.items).get(0).quality(), equalTo(6));
+    }
+
     private void addAnItem(String name, int sellIn, int quality) {
         items.add(new Item(name, sellIn, quality));
 

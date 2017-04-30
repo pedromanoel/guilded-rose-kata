@@ -54,7 +54,6 @@ public class App {
                 continue;
             }
 
-            decreaseQuality(item);
         }
 
         return returnItems;
@@ -73,7 +72,7 @@ public class App {
             return;
         }
 
-        item.quality(item.quality() - getDecrease());
+        item.quality(item.quality() - getDecrease(item));
     }
 
     private int getIncrease(Item item) {
@@ -92,8 +91,18 @@ public class App {
         return increase;
     }
 
-    private int getDecrease() {
-        return 1;
+    private int getDecrease(Item item) {
+        int decrease = 1;
+
+        if (item.sellIn() <= 0) {
+            decrease = 2;
+        }
+
+        if (Stream.of("Conjured").anyMatch(item.name()::equals)) {
+            decrease *= 2;
+        }
+
+        return decrease;
     }
 
     private boolean decreasesQualityWithTime(Item item) {
