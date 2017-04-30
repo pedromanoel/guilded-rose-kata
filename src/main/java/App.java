@@ -8,16 +8,21 @@ import java.util.stream.Stream;
 
 public class App {
 
+    private static final String BACKSTAGE_PASSES = "Backstage passes to a TAFKAL80ETC concert";
+    private static final String AGED_BRIE = "Aged Brie";
+    private static final String CONJURED = "Conjured";
+    private static final String SULFURAS_HAND_OF_RAGNAROS = "Sulfuras, Hand of Ragnaros";
+
     public static void main(String[] args) {
         System.out.println("OMGHAI!");
 
         App app = new App();
         List<Item> items = Arrays.asList(
                 new Item("+5 Dexterity Vest", 10, 20),
-                new Item("Aged Brie", 2, 0),
+                new Item(AGED_BRIE, 2, 0),
                 new Item("Elixir of the Mongoose", 5, 7),
-                new Item("Sulfuras, Hand of Ragnaros", 0, 80),
-                new Item("Backstage passes to a TAFKAL80ETC concert", 15, 20),
+                new Item(SULFURAS_HAND_OF_RAGNAROS, 0, 80),
+                new Item(BACKSTAGE_PASSES, 15, 20),
                 new Item("Conjured Mana Cake", 3, 6)
         );
 
@@ -28,32 +33,17 @@ public class App {
         ArrayList<Item> returnItems = new ArrayList<>(items);
 
         for (Item item : returnItems) {
-            if (item.name().equals("Sulfuras, Hand of Ragnaros")) {
+            if (item.name().equals(SULFURAS_HAND_OF_RAGNAROS)) {
                 continue;
             }
 
-            if (decreasesQualityWithTime(item)) {
-                decreaseQuality(item);
-            } else {
+            if (increasesQualityWithTime(item)) {
                 increaseQuality(item);
+            } else {
+                decreaseQuality(item);
             }
-
+            
             item.sellIn(item.sellIn() - 1);
-
-            if (item.sellIn() >= 0) {
-                continue;
-            }
-
-            if (item.name().equals("Aged Brie")) {
-                continue;
-            }
-
-            if (Objects.equals(item.name(), "Backstage passes to a TAFKAL80ETC concert")) {
-                item.quality(item.quality() - item.quality());
-
-                continue;
-            }
-
         }
 
         return returnItems;
@@ -78,7 +68,7 @@ public class App {
     private int getIncrease(Item item) {
         int increase = 1;
 
-        if (item.name().equals("Backstage passes to a TAFKAL80ETC concert")) {
+        if (item.name().equals(BACKSTAGE_PASSES)) {
             if (item.sellIn() < 11) {
                 increase = 2;
             }
@@ -92,25 +82,24 @@ public class App {
     }
 
     private int getDecrease(Item item) {
-        int decrease = 1;
+        int decrease = item.sellIn() > 0 ? 1 : 2;
 
-        if (item.sellIn() <= 0) {
-            decrease = 2;
+        if (CONJURED.equals(item.name())) {
+            decrease *= 2;
         }
 
-        if (Stream.of("Conjured").anyMatch(item.name()::equals)) {
-            decrease *= 2;
+        if (item.name().equals(BACKSTAGE_PASSES) && item.sellIn() == 0) {
+            decrease = item.quality();
         }
 
         return decrease;
     }
 
-    private boolean decreasesQualityWithTime(Item item) {
-        boolean decreases;
+    private boolean increasesQualityWithTime(Item item) {
+        String name = item.name();
 
-        decreases = Stream.of("Aged Brie", "Backstage passes to a TAFKAL80ETC concert")
-                .noneMatch(i -> item.name().equals(i));
+        boolean validBackstagePass = BACKSTAGE_PASSES.equals(name) && item.sellIn() > 0;
 
-        return decreases;
+        return AGED_BRIE.equals(name) || validBackstagePass;
     }
 }
